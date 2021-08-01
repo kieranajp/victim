@@ -31,4 +31,12 @@ spec:
         - name: http
           containerPort: 80
           protocol: TCP
+        env:
+        {{- range .Values.secrets }}
+        - name: {{ . }}
+          valueFrom:
+            secretKeyRef:
+              name: "{{ include "chart.name" $ }}-secrets"
+              key: {{ . }}
+        {{- end }}
           

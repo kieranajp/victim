@@ -7,3 +7,7 @@ version: latest
 replicas: 1
 
 # imagePullSecret: docker-registry-pullsecret
+
+secrets:
+- SLACK_APP_TOKEN
+- SLACK_BOT_TOKEN
