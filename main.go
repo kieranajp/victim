@@ -26,7 +26,14 @@ func main() {
 				Required: true,
 			},
 		},
-		Action: handler.StartBot,
+		Commands: []*cli.Command{
+			{
+				Name:   "socket",
+				Usage:  "Start in socket mode",
+				Action: handler.StartSocketMode,
+			},
+		},
+		Action: handler.StartSocketMode,
 	}
 
 	err := app.Run(os.Args)

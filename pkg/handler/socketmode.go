@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func StartBot(c *cli.Context) error {
+func StartSocketMode(c *cli.Context) error {
 	api, client := driver.NewSlackClient(c.String("slack-app-token"), c.String("slack-bot-token"))
 
 	go func() {
