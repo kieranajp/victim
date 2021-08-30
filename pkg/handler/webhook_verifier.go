@@ -1,4 +1,4 @@
-package driver
+package handler
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"github.com/slack-go/slack/slackevents"
 )
 
-func WebhookVerifier(w http.ResponseWriter, r *http.Request) {
+func HandleWebhookVerification(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
