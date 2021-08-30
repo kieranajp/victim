@@ -1,23 +1,8 @@
 package handler
 
 import (
-	"strings"
-
 	"github.com/slack-go/slack"
 )
-
-func FindMentions(payload string) []string {
-	input := strings.Split(payload, " ")
-
-	var mentions []string
-	for _, word := range input {
-		if strings.HasPrefix(word, "@") {
-			mentions = append(mentions, word)
-		}
-	}
-
-	return mentions
-}
 
 func ResolveUserGroups(mentions []string, api *slack.Client) ([]string, error) {
 	groups, err := api.GetUserGroups()
@@ -29,7 +14,7 @@ func ResolveUserGroups(mentions []string, api *slack.Client) ([]string, error) {
 	var users []string
 	for _, group := range groups {
 		for _, mention := range mentions {
-			if "@"+group.Handle == mention {
+			if "@"+group.ID == mention {
 				resolved = append(resolved, mention)
 				members, err := fetchUsersInGroup(api, group)
 				if err != nil {

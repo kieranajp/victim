@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/kieranajp/victim/pkg/handler"
+	"github.com/kieranajp/victim/pkg/server"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
@@ -27,7 +27,7 @@ func main() {
 				Required: true,
 			},
 		},
-		Action: handler.StartWebhookMode,
+		Action: server.Start,
 	}
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})

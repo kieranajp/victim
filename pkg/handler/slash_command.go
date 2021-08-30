@@ -11,7 +11,7 @@ import (
 	"github.com/slack-go/slack"
 )
 
-func HandleSlashCommand(rw http.ResponseWriter, r *http.Request) {
+func (h *SlackHandler) HandleSlashCommand(rw http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Invalid incoming webhook")
@@ -22,6 +22,11 @@ func HandleSlashCommand(rw http.ResponseWriter, r *http.Request) {
 		Msg("Received Slack slash command")
 
 	users := ExtractUsers(r.FormValue("text"))
+	users, err = ResolveUserGroups(users, h.API)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to resolve user groups")
+	}
+
 	responseJson := GenerateResponse(users)
 
 	rw.Header().Set("Content-Type", "application/json")
@@ -30,7 +35,7 @@ func HandleSlashCommand(rw http.ResponseWriter, r *http.Request) {
 
 // ExtractUsers takes in the incoming text from a Slack command, and finds all the linkable @user entities within.
 func ExtractUsers(text string) []string {
-	r := regexp.MustCompile(`<([^<|>]*)[\|>]`)
+	r := regexp.MustCompile(`<(@[^<|>]*)[\|>]`)
 	m := r.FindAllStringSubmatch(text, -1)
 
 	var users []string

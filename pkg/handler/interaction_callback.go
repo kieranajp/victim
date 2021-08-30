@@ -32,11 +32,7 @@ func (p *InteractionPayload) GetUsers() (users []string) {
 	return
 }
 
-type InteractionHandler struct {
-	API *slack.Client
-}
-
-func (h *InteractionHandler) HandleInteraction(rw http.ResponseWriter, r *http.Request) {
+func (h *SlackHandler) HandleInteraction(rw http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	var p InteractionPayload
 	json.Unmarshal([]byte(r.FormValue("payload")), &p)

@@ -1,4 +1,4 @@
-package handler
+package server
 
 import (
 	"net/http"
@@ -9,15 +9,17 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func StartWebhookMode(c *cli.Context) error {
-	api := driver.NewSlackClient(c.String("slack-app-token"), c.String("slack-bot-token"))
+func Start(c *cli.Context) error {
+	sh := &handler.SlackHandler{
+		API: driver.NewSlackClient(
+			c.String("slack-app-token"),
+			c.String("slack-bot-token"),
+		),
+	}
 
 	http.HandleFunc("/slack/events", handler.HandleWebhookVerification)
-
-	http.HandleFunc("/slack/commands", handler.HandleSlashCommand)
-
-	ih := &handler.InteractionHandler{API: api}
-	http.HandleFunc("/slack/interactions", ih.HandleInteraction)
+	http.HandleFunc("/slack/commands", sh.HandleSlashCommand)
+	http.HandleFunc("/slack/interactions", sh.HandleInteraction)
 
 	log.Info().Msg("Server listening")
 	http.ListenAndServe(":3000", nil)
