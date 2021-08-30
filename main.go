@@ -1,10 +1,11 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/kieranajp/victim/pkg/handler"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
 
@@ -26,18 +27,12 @@ func main() {
 				Required: true,
 			},
 		},
-		Commands: []*cli.Command{
-			{
-				Name:   "socket",
-				Usage:  "Start in socket mode",
-				Action: handler.StartSocketMode,
-			},
-		},
-		Action: handler.StartSocketMode,
+		Action: handler.StartWebhookMode,
 	}
 
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("App crashed")
 	}
 }

@@ -1,55 +1,40 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/kieranajp/victim/pkg/driver"
+	"github.com/rs/zerolog/log"
 	"github.com/slack-go/slack"
-	"github.com/slack-go/slack/slackevents"
 	"github.com/urfave/cli/v2"
 )
 
 func StartWebhookMode(c *cli.Context) error {
 	api, _ := driver.NewSlackClient(c.String("slack-app-token"), c.String("slack-bot-token"))
 
-	http.HandleFunc("/events-endpoint", func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
+	http.HandleFunc("/slack/events", driver.WebhookVerifier)
 
+	http.HandleFunc("/slack/commands", func(rw http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
+			log.Fatal().Err(err).Msg("Invalid incoming webhook")
 		}
 
-		eventsAPIEvent, err := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionNoVerifyToken())
+		log.Info().
+			Str("payload", fmt.Sprintf("%+v\n", r.PostForm)).
+			Msg("Received Slack webhook")
+
+		users := ExtractUsers(r.FormValue("text"))
+		user := PickRandomUser(users)
+
+		_, _, err = api.PostMessage(r.FormValue("channel_id"), slack.MsgOptionText(fmt.Sprintf("I have chosen: <%s>", user), false))
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if eventsAPIEvent.Type == slackevents.URLVerification {
-			var r *slackevents.ChallengeResponse
-			err := json.Unmarshal([]byte(body), &r)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.Header().Set("Content-Type", "text")
-			w.Write([]byte(r.Challenge))
-		}
-
-		if eventsAPIEvent.Type == slackevents.CallbackEvent {
-			innerEvent := eventsAPIEvent.InnerEvent
-			switch ev := innerEvent.Data.(type) {
-			case *slackevents.AppMentionEvent:
-				api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
-			}
+			log.Fatal().Err(err).Msg("Failed posting message via Slack API")
 		}
 	})
 
-	fmt.Println("[INFO] Server listening")
+	log.Info().Msg("Server listening")
 	http.ListenAndServe(":3000", nil)
 
 	return nil
