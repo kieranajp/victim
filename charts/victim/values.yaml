@@ -3,6 +3,11 @@ name: victim
 namespace: victim
 image: kieranajp/victim
 version: latest
+port: 3000
+
+ingress:
+  domain: example.com
+  path: /victim
 
 replicas: 1
 
