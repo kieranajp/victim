@@ -27,6 +27,12 @@ func (h *SlackHandler) HandleSlashCommand(rw http.ResponseWriter, r *http.Reques
 		log.Fatal().Err(err).Msg("Failed to resolve user groups")
 	}
 
+	if len(users) == 0 {
+		log.Info().Msg("No users found")
+		rw.Write([]byte("I couldn't find any matching users to victimise!"))
+		return
+	}
+
 	responseJson := GenerateResponse(users)
 
 	rw.Header().Set("Content-Type", "application/json")
