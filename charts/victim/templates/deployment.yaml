@@ -28,10 +28,11 @@ spec:
         imagePullPolicy: Always
         command: [ "/victim" ]
         ports:
-        - name: api
-          containerPort: {{ .Values.port }}
+        - containerPort: {{ .Values.port }}
           protocol: TCP
         env:
+        - name: LISTEN_ADDRESS
+          value: "0.0.0.0:{{ .Values.port }}"
         {{- range .Values.secrets }}
         - name: {{ . }}
           valueFrom:

@@ -12,6 +12,5 @@ spec:
   type: ClusterIP
   ports:
     - port: {{ .Values.port }}
-      targetPort: api
+      targetPort: {{ .Values.port }}
       protocol: TCP
-      name: api
