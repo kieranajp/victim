@@ -42,6 +42,12 @@ func (h *SlackHandler) HandleInteraction(rw http.ResponseWriter, r *http.Request
 		Str("users", fmt.Sprintf("%+v\n", users)).
 		Msg("Received Slack interaction")
 
+	if len(users) == 0 {
+		log.Error().Msg("No users in request")
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	user := PickRandomUser(users)
 
 	_, _, err := h.API.PostMessage(p.ChannelID(), slack.MsgOptionText(fmt.Sprintf("I have chosen: %s", user), false))
