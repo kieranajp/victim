@@ -24,7 +24,7 @@ func Start(c *cli.Context) error {
 	http.HandleFunc("/slack/interactions", sh.HandleInteraction)
 
 	log.Info().Msg(fmt.Sprintf("Server listening on %s", c.String("listen-address")))
-	err := http.ListenAndServe(fmt.Sprintf(":%s", c.String("listen-address")), nil)
+	err := http.ListenAndServe(c.String("listen-address"), nil)
 
 	return err
 }
