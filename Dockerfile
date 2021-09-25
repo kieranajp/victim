@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM  golang:1.16-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.17-alpine AS builder
 
 # Parses TARGETPLATFORM and converts it to GOOS, GOARCH, and GOARM.
 COPY --from=tonistiigi/xx:golang / /
@@ -17,6 +17,7 @@ RUN CGO_ENABLED=0 go build -a -o /victim
 
 FROM scratch
 
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 COPY --from=builder /victim /victim
