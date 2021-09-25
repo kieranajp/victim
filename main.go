@@ -26,6 +26,13 @@ func main() {
 				EnvVars:  []string{"SLACK_BOT_TOKEN"},
 				Required: true,
 			},
+			&cli.StringFlag{
+				Name:        "port",
+				Usage:       "Port to listen on",
+				EnvVars:     []string{"PORT"},
+				Value:       "80",
+				DefaultText: "80",
+			},
 		},
 		Action: server.Start,
 	}
@@ -33,6 +40,6 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal().Err(err).Msg("App crashed")
+		log.Fatal().Err(err).Msg("Exit")
 	}
 }

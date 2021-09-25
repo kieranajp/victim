@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/kieranajp/victim/pkg/driver"
@@ -22,8 +23,8 @@ func Start(c *cli.Context) error {
 	http.HandleFunc("/slack/commands", sh.HandleSlashCommand)
 	http.HandleFunc("/slack/interactions", sh.HandleInteraction)
 
-	log.Info().Msg("Server listening")
-	http.ListenAndServe(":3000", nil)
+	log.Info().Msg(fmt.Sprintf("Server listening on %s", c.String("port")))
+	err := http.ListenAndServe(fmt.Sprintf(":%s", c.String("port")), nil)
 
-	return nil
+	return err
 }
