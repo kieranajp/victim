@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/kieranajp/victim/pkg/driver"
@@ -18,13 +17,14 @@ func Start(c *cli.Context) error {
 		),
 	}
 
-	http.HandleFunc("/healthz", handler.Healthz)
-	http.HandleFunc("/slack/events", handler.HandleWebhookVerification)
-	http.HandleFunc("/slack/commands", sh.HandleSlashCommand)
-	http.HandleFunc("/slack/interactions", sh.HandleInteraction)
+	http.HandleFunc("/healthz", handler.WithLogging(handler.Healthz))
+	http.HandleFunc("/slack/events", handler.WithLogging(handler.HandleWebhookVerification))
+	http.HandleFunc("/slack/commands", handler.WithLogging(sh.HandleSlashCommand))
+	http.HandleFunc("/slack/interactions", handler.WithLogging(sh.HandleInteraction))
 
-	log.Info().Msg(fmt.Sprintf("Server listening on %s", c.String("listen-address")))
-	err := http.ListenAndServe(c.String("listen-address"), nil)
+	log.Info().
+		Str("listen_address", c.String("listen-address")).
+		Msg("Server listening")
 
-	return err
+	return http.ListenAndServe(c.String("listen-address"), nil)
 }
