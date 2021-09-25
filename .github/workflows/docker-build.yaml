@@ -37,4 +37,6 @@ jobs:
           context: .
           platforms: linux/arm/v7,linux/arm64/v8,linux/amd64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/victim:${{ steps.vars.outputs.GITHUB_SHORT_SHA }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/victim:${{ steps.vars.outputs.GITHUB_SHORT_SHA }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/victim:latest
