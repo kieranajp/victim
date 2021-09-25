@@ -6,6 +6,11 @@ metadata:
   labels:
     {{- include "chart.labels" . | nindent 4 }}
 spec:
+  defaultBackend:
+    service:
+      name: {{ include "chart.name" . }}
+      port:
+        number: {{ .Values.port }}
   rules:
   - host: {{ .Values.ingress.domain }}
     http:

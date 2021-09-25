@@ -28,8 +28,8 @@ spec:
         imagePullPolicy: Always
         command: [ "/victim" ]
         ports:
-        - name: http
-          containerPort: 80
+        - name: api
+          containerPort: {{ .Values.port }}
           protocol: TCP
         env:
         {{- range .Values.secrets }}

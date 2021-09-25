@@ -17,6 +17,7 @@ func Start(c *cli.Context) error {
 		),
 	}
 
+	http.HandleFunc("/healthz", handler.Healthz)
 	http.HandleFunc("/slack/events", handler.HandleWebhookVerification)
 	http.HandleFunc("/slack/commands", sh.HandleSlashCommand)
 	http.HandleFunc("/slack/interactions", sh.HandleInteraction)
