@@ -15,15 +15,15 @@ func main() {
 		Usage: "Pick a name out of a hat.",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:     "slack-app-token",
-				Usage:    "Slack app token (for websockets)",
-				EnvVars:  []string{"SLACK_APP_TOKEN"},
+				Name:     "slack-client-id",
+				Usage:    "Slack OAuth Client ID",
+				EnvVars:  []string{"SLACK_CLIENT_ID"},
 				Required: true,
 			},
 			&cli.StringFlag{
-				Name:     "slack-bot-token",
-				Usage:    "Slack bot token (for @mentions)",
-				EnvVars:  []string{"SLACK_BOT_TOKEN"},
+				Name:     "slack-client-secret",
+				Usage:    "Slack OAuth Client Secret",
+				EnvVars:  []string{"SLACK_CLIENT_SECRET"},
 				Required: true,
 			},
 			&cli.StringFlag{
