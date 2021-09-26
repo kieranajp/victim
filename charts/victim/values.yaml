@@ -13,12 +13,10 @@ replicas: 1
 
 # imagePullSecret: docker-registry-pullsecret
 
-database:
-  host: 127.0.0.1
-  port: 5432
+storage:
+  class: local-path
+  size: 1Gi
 
 secrets:
 - SLACK_CLIENT_ID
 - SLACK_CLIENT_SECRET
-- DB_USER
-- DB_PASS

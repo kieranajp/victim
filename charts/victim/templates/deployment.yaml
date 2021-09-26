@@ -22,6 +22,11 @@ spec:
       - name: {{ .Values.imagePullSecret }}
       {{- end }}
 
+      volumes:
+      - name: victim-db-pvc
+        persistentVolumeClaim:
+          claimName: victim-db-pvc
+
       containers:
       - image: "{{ .Values.image }}:{{ .Values.version }}"
         name: {{ .Values.name }}
@@ -30,11 +35,10 @@ spec:
         ports:
         - containerPort: {{ .Values.port }}
           protocol: TCP
+        volumeMounts:
+        - name: victim-db-pvc
+          mountPath: /data
         env:
-        - name: DB_USER
-          value: {{ .Values.database.host }}
-        - name: DB_PORT
-          value: {{ .Values.database.port }}
         - name: LISTEN_ADDRESS
           value: "0.0.0.0:{{ .Values.port }}"
         {{- range .Values.secrets }}
