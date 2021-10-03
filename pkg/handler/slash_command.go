@@ -22,10 +22,13 @@ func (h *SlackHandler) HandleSlashCommand(rw http.ResponseWriter, r *http.Reques
 		Msg("Received Slack slash command")
 
 	users := ExtractUsers(r.FormValue("text"))
+	exclusions := ExtractExclusions(r.FormValue("text"))
 	users, err = ResolveUserGroups(users, h.API)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to resolve user groups")
 	}
+
+	users = ResolveExclusions(users, exclusions)
 
 	if len(users) == 0 {
 		log.Info().Msg("No users found")
