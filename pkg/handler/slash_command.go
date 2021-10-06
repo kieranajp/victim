@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/kieranajp/victim/pkg/database"
 	"github.com/rs/zerolog/log"
 	"github.com/slack-go/slack"
 )
@@ -20,6 +21,20 @@ func (h *SlackHandler) HandleSlashCommand(rw http.ResponseWriter, r *http.Reques
 	log.Info().
 		Str("payload", fmt.Sprintf("%+v\n", r.PostForm)).
 		Msg("Received Slack slash command")
+
+	token, err := database.GetToken(database.New(), r.FormValue("team_id"))
+	if err != nil || len(token) < 1 {
+		log.Fatal().
+			Err(err).
+			Str("team_id", r.FormValue("team_id")).
+			Str("team_name", r.FormValue("team_domain")).
+			Msg("Unknown team")
+	}
+
+	log.Info().
+		Str("team_id", r.FormValue("team_id")).
+		Str("team_name", r.FormValue("team_domain")).
+		Msg("Team authenticated successfully")
 
 	users := ExtractUsers(r.FormValue("text"))
 	exclusions := ExtractExclusions(r.FormValue("text"))
