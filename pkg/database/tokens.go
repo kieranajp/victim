@@ -8,7 +8,7 @@ import (
 )
 
 func New() *bolt.DB {
-	db, err := bolt.Open("/data/victim.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open("./data/victim.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to open database")
 	}
