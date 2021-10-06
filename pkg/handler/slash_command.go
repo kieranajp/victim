@@ -8,11 +8,12 @@ import (
 	"strings"
 
 	"github.com/kieranajp/victim/pkg/database"
+	"github.com/kieranajp/victim/pkg/driver"
 	"github.com/rs/zerolog/log"
 	"github.com/slack-go/slack"
 )
 
-func (h *SlackHandler) HandleSlashCommand(rw http.ResponseWriter, r *http.Request) {
+func HandleSlashCommand(rw http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Invalid incoming webhook")
@@ -22,14 +23,16 @@ func (h *SlackHandler) HandleSlashCommand(rw http.ResponseWriter, r *http.Reques
 		Str("payload", fmt.Sprintf("%+v\n", r.PostForm)).
 		Msg("Received Slack slash command")
 
-	token, err := database.GetToken(database.New(), r.FormValue("team_id"))
-	if err != nil || len(token) < 1 {
+	accessToken, botToken, err := database.GetToken(database.New(), r.FormValue("team_id"))
+	if err != nil || len(accessToken) < 1 {
 		log.Fatal().
 			Err(err).
 			Str("team_id", r.FormValue("team_id")).
 			Str("team_name", r.FormValue("team_domain")).
 			Msg("Unknown team")
 	}
+
+	api := driver.NewSlackClient(accessToken, botToken)
 
 	log.Info().
 		Str("team_id", r.FormValue("team_id")).
@@ -38,7 +41,7 @@ func (h *SlackHandler) HandleSlashCommand(rw http.ResponseWriter, r *http.Reques
 
 	users := ExtractUsers(r.FormValue("text"))
 	exclusions := ExtractExclusions(r.FormValue("text"))
-	users, err = ResolveUserGroups(users, h.API)
+	users, err = ResolveUserGroups(users, api)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to resolve user groups")
 	}

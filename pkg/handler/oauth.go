@@ -66,14 +66,14 @@ func (o *OAuthHandler) Authorize(rw http.ResponseWriter, r *http.Request) {
 
 	teamID := gjson.Get(bodyStr, "team.id")
 	teamName := gjson.Get(bodyStr, "team.name")
-	token := gjson.Get(bodyStr, "access_token")
+	accessToken := gjson.Get(bodyStr, "access_token")
+	botToken := gjson.Get(bodyStr, "bot.bot_access_token")
 
-	database.SaveToken(database.New(), teamID.String(), token.String())
+	database.SaveToken(database.New(), teamID.String(), accessToken.String(), botToken.String())
 
 	log.Info().
 		Str("team_id", teamID.String()).
 		Str("team_name", teamName.String()).
-		Str("token", token.String()).
 		Msg("Access token retrieved")
 
 	rw.Write([]byte(fmt.Sprintf("<h1>Successfully authorized %s</h1><p>You can close this tab now</p>", teamName.String())))
