@@ -2,13 +2,7 @@ package handler
 
 import (
 	"net/http"
-
-	"github.com/slack-go/slack"
 )
-
-type SlackHandler struct {
-	API *slack.Client
-}
 
 type OAuthHandler struct {
 	ClientID     string

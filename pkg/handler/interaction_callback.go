@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kieranajp/victim/pkg/database"
+	"github.com/kieranajp/victim/pkg/driver"
 	"github.com/rs/zerolog/log"
 	"github.com/slack-go/slack"
 )
@@ -32,7 +34,7 @@ func (p *InteractionPayload) GetUsers() (users []string) {
 	return
 }
 
-func (h *SlackHandler) HandleInteraction(rw http.ResponseWriter, r *http.Request) {
+func HandleInteraction(rw http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	var p InteractionPayload
 	json.Unmarshal([]byte(r.FormValue("payload")), &p)
@@ -48,9 +50,20 @@ func (h *SlackHandler) HandleInteraction(rw http.ResponseWriter, r *http.Request
 		return
 	}
 
+	accessToken, botToken, err := database.GetToken(database.New(), r.FormValue("team_id"))
+	if err != nil || len(accessToken) < 1 {
+		log.Fatal().
+			Err(err).
+			Str("team_id", r.FormValue("team_id")).
+			Str("team_name", r.FormValue("team_domain")).
+			Msg("Unknown team")
+	}
+
+	api := driver.NewSlackClient(accessToken, botToken)
+
 	user := PickRandomUser(users)
 
-	_, _, err := h.API.PostMessage(p.ChannelID(), slack.MsgOptionText(fmt.Sprintf("I have chosen: %s", user), false))
+	_, _, err = api.PostMessage(p.ChannelID(), slack.MsgOptionText(fmt.Sprintf("I have chosen: %s", user), false))
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed posting message via Slack API")
 	}

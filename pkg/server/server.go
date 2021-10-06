@@ -9,13 +9,6 @@ import (
 )
 
 func Start(c *cli.Context) error {
-	// sh := &handler.SlackHandler{
-	// 	API: driver.NewSlackClient(
-	// 		c.String("slack-app-token"),
-	// 		c.String("slack-bot-token"),
-	// 	),
-	// }
-
 	oh := &handler.OAuthHandler{
 		ClientID:     c.String("slack-client-id"),
 		ClientSecret: c.String("slack-client-secret"),
@@ -26,9 +19,9 @@ func Start(c *cli.Context) error {
 	http.HandleFunc("/slack/oauth/redirect", handler.WithLogging(oh.Redirect))
 	http.HandleFunc("/slack/oauth/authorize", handler.WithLogging(oh.Authorize))
 
-	// http.HandleFunc("/slack/events", handler.WithLogging(handler.HandleWebhookVerification))
-	// http.HandleFunc("/slack/commands", handler.WithLogging(sh.HandleSlashCommand))
-	// http.HandleFunc("/slack/interactions", handler.WithLogging(sh.HandleInteraction))
+	http.HandleFunc("/slack/events", handler.WithLogging(handler.HandleWebhookVerification))
+	http.HandleFunc("/slack/commands", handler.WithLogging(handler.HandleSlashCommand))
+	http.HandleFunc("/slack/interactions", handler.WithLogging(handler.HandleInteraction))
 
 	log.Info().
 		Str("listen_address", c.String("listen-address")).

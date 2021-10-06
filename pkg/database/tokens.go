@@ -1,6 +1,8 @@
 package database
 
 import (
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -16,7 +18,7 @@ func New() *bolt.DB {
 	return db
 }
 
-func GetToken(db *bolt.DB, teamID string) (string, error) {
+func GetToken(db *bolt.DB, teamID string) (string, string, error) {
 	var token string
 
 	err := db.View(func(tx *bolt.Tx) error {
@@ -29,10 +31,17 @@ func GetToken(db *bolt.DB, teamID string) (string, error) {
 		return nil
 	})
 
-	return token, err
+	tokens := strings.Split(token, "|")
+	if len(tokens) != 2 {
+		return "", "", errors.New("token saved in invalid format")
+	}
+
+	return tokens[0], tokens[1], err
 }
 
-func SaveToken(db *bolt.DB, teamID, token string) error {
+func SaveToken(db *bolt.DB, teamID, accessToken, botToken string) error {
+	token := strings.Join([]string{accessToken, botToken}, "|")
+
 	return db.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("tokens"))
 		if err != nil {
